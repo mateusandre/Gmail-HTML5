@@ -73,6 +73,9 @@
 		if (database.indice == undefined)	//Verifica se tem tem um storage que conta a quantidade de usuários cadastrados.
 			database.indice = 0;	//Se não existir ele inicia a contagem a partir do zero.
 
+		if (database.logados == undefined)	//Verifica se o storage que guarda o índice de usuários logados não existe
+				database['logados'] = JSON.stringify(new Array()); //Se não existir ele cria um Array vazio.
+
 		//Função que é executada ao submeter o formulário para salvar o novo usuário
 		function salvar(){
 			var senha = document.getElementById('senha');	//Salva o elemeto que recebeu a senha
@@ -83,12 +86,21 @@
 				rsenha.focus();	//Coloca o foco sobre o campo de repetir a senha
 				erro.innerHTML = "As senhas não conferem!";	//Adiciona uma mensagem de erro
 				return false;	//para a execução da função
-			}	
+			}				
 			var file = document.getElementById('imagem').files[0]; //Variável que recebe o arquivo adicionado no fileupload			
-			var data = { 'nome': document.getElementById('nome').value, 'sobrenome': document.getElementById('sobrenome').value, 'nascimento': document.getElementById('nascimento').value, 'usuario': document.getElementById('usuario').value, 'senha':  document.getElementById('senha').value, 'foto': "imagens-perfil/" + file.name};	//cria um JSON dos dados do usuário
+			var foto = "user.png";
+			if(file != undefined){
+				foto = file.name;
+			}
+			var data = { 'nome': document.getElementById('nome').value, 'sobrenome': document.getElementById('sobrenome').value, 'nascimento': document.getElementById('nascimento').value, 'usuario': document.getElementById('usuario').value, 'senha':  document.getElementById('senha').value, 'foto': "imagens-perfil/" + foto};	//cria um JSON dos dados do usuário
 			database.indice = parseInt(database.indice) + 1;	//Incrementa o índice de usuários criados
 			var created = database.setItem("usuario" + database.indice, JSON.stringify(data));	//Cria o storage do usuário em questão
 			database.usuarioLogado = database.getItem("usuario" + database.indice);	//Seta o usuário como logado
+			var usuario = "usuario" + database.indice;	//Seta o nome do usuário criado
+			var logados = JSON.parse(database.logados);	//Converte para JSON
+			if(logados.indexOf(usuario) == -1)	//Verifica se o usuário não está na lista dos que logaram.
+				logados.push(usuario);	//Se não estiver adiciona na lista
+			database.logados = JSON.stringify(logados);	//Volta a lista alterada para o storage			
 		}
 	</script>
 </head>
