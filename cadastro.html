@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf8">
+	<title>Crie sua Conta do Google</title>
+	<style type="text/css">
+		#pagina{
+			font-family: Arial;
+			height: auto;
+			padding: 3%;
+			padding-top: 20px;
+			text-align: center;
+			color: #888;
+		}
+		h1{
+			font-size: 25px;
+			font-weight: normal;
+		}
+		h2{
+			font-size: 20px;
+			font-weight: normal;
+		}
+		#logo{
+			width: 110px;
+		}
+		#form{
+			width: 25%;
+			margin: auto;
+			padding: 3%;
+			background-color: #f7f7f7;
+		}
+		a{
+			color: #09f;
+		}
+		input{
+			width: 98%;			
+			font-family: arial;
+			font-size: 17px;
+			padding-top: 12px;
+			padding-bottom: 12px;
+			padding-left: 2%;
+			border-color: #ccc;
+			border-width: 1px;
+			border-style: solid;
+		}
+		input[type="submit"]{
+			width: 100%;
+			margin-top: 10px;
+			margin-bottom: 20px;
+			background-color: #07f;
+			color: #fff;
+			font-weight: bold;	
+			font-size: 14px;		
+			border: none;
+			border-radius: 5px;
+			margin-left: auto;
+			margin-right: auto;
+		}		
+		input[type="submit"]:hover{
+			background-color: #06f;
+		}
+		form{
+			color: #f00;
+			text-align: left;
+		}
+		.erro{
+			border-color: #f00;
+			outline: none;
+		}
+	</style>
+	<script type="text/javascript">
+		var database = localStorage; //Setando a variável do storage.
+		if (database.indice == undefined)	//Verifica se tem tem um storage que conta a quantidade de usuários cadastrados.
+			database.indice = 0;	//Se não existir ele inicia a contagem a partir do zero.
+
+		//Função que é executada ao submeter o formulário para salvar o novo usuário
+		function salvar(){
+			var senha = document.getElementById('senha');	//Salva o elemeto que recebeu a senha
+			var rsenha = document.getElementById('rsenha');	//Salva o elemeto que recebeu a confirmação da senha
+			var erro = document.getElementById('erro');	//Salva o elemeto que recebe as mensagens de erro
+			if (senha.value != rsenha.value){	//Verifica se a senha e a confirmação são diferentes
+				rsenha.setAttribute('class', 'erro');	//Adiciona a classe de erro ao campo re repetir senha
+				rsenha.focus();	//Coloca o foco sobre o campo de repetir a senha
+				erro.innerHTML = "As senhas não conferem!";	//Adiciona uma mensagem de erro
+				return false;	//para a execução da função
+			}	
+			var file = document.getElementById('imagem').files[0]; //Variável que recebe o arquivo adicionado no fileupload			
+			var data = { 'nome': document.getElementById('nome').value, 'sobrenome': document.getElementById('sobrenome').value, 'nascimento': document.getElementById('nascimento').value, 'usuario': document.getElementById('usuario').value, 'senha':  document.getElementById('senha').value, 'foto': "imagens-perfil/" + file.name};	//cria um JSON dos dados do usuário
+			database.indice = parseInt(database.indice) + 1;	//Incrementa o índice de usuários criados
+			var created = database.setItem("usuario" + database.indice, JSON.stringify(data));	//Cria o storage do usuário em questão
+			database.usuarioLogado = database.getItem("usuario" + database.indice);	//Seta o usuário como logado
+		}
+	</script>
+</head>
+<body>
+	<div id="pagina">
+		<img id="logo" src="imagens/logo.png">
+		<h1>Crie sua Conta do Google</h1>
+		<div id="form">
+			<form action="inbox.html" method="post" onsubmit="return salvar()">
+				<input type="text" placeholder="Nome" id="nome" name="nome" required>
+				<input type="text" placeholder="Sobrenome" id="sobrenome" name="sobrenome">
+				<input type="file" id="imagem" name="imagem">
+				<input type="text" placeholder="Escolha seu nome de usuário" id="usuario" name="usuario" required>
+				<input type="date" placeholder="Data de nascimento" id="nascimento" name="nascimento" required>
+				<input type="password" placeholder="Senha" id="senha" name="senha" required>
+				<input type="password" placeholder="Repetir senha" id="rsenha" name="rsenha" required>
+				<span id="erro"></span>
+				<input type="submit" value="Criar conta">
+			</form>
+			<a href="login.html">Cancelar</a>
+		</div>
+	</div>
+</body>
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf8">
+	<title>Gmail</title>
+	<style type="text/css">
+		#pagina{
+			font-family: Arial;
+			height: auto;
+			padding: 3%;
+			padding-top: 20px;
+			text-align: center;
+			color: #888;
+		}
+		h1{
+			font-size: 35px;
+			font-weight: normal;
+		}
+		h2{
+			font-size: 20px;
+			font-weight: normal;
+		}
+		#logo{
+			width: 110px;
+		}
+		#form{
+			width: 20%;
+			margin: auto;
+			padding: 3%;
+			background-color: #f7f7f7;
+			box-shadow: 0px 3px 3px #aaa;
+		}
+		#form img{
+			width: 100px;
+			height: 100px;
+			border-radius: 100px;
+			margin-bottom: 20px;
+		}
+		a{
+			color: #09f;
+			text-decoration: none;
+		}
+		a:hover{
+			text-decoration: underline;
+		}
+		input{
+			width: 98%;
+			height: 35px;
+			font-family: arial;
+			font-size: 17px;
+			padding-left: 2%;
+			border-color: #ccc;
+			border-width: 1px;
+			border-style: solid;
+		}
+		input[type="submit"]{
+			width: 100%;
+			margin-top: 10px;
+			margin-bottom: 20px;
+			background-color: #07f;
+			color: #fff;
+			font-weight: bold;	
+			font-size: 14px;		
+			border: none;
+			border-radius: 5px;
+			margin-left: auto;
+			margin-right: auto;
+		}		
+		input[type="submit"]:hover{
+			background-color: #06f;
+		}
+		input[type="password"]{
+			margin-bottom: 10px;
+		}
+		form{
+			color: #f00;
+			text-align: left;
+		}
+		.erro{
+			border-color: #f00;
+			outline: none;
+		}
+		#erro{
+			font-size: 14px;
+		}
+		.logado{
+			text-align: center;
+			border: none;
+			outline: none;
+			background-color: transparent;		
+		}		
+		#outra-conta{
+			display: none;
+			color: #09f;
+			cursor: pointer;
+		}
+		#outra-conta:hover{
+			text-decoration: underline;
+		}
+	</style>
+	<script type="text/javascript">
+		var database = localStorage;		
+
+		//Função que é executada quando a página é carregada.
+		function init(){
+			if (database.logados == undefined)	//Verifica se o storage que guarda o índice de usuários logados não existe
+				database['logados'] = JSON.stringify(new Array()); //Se não existir ele cria um Array vazio.
+
+			if (database.usuarioLogado != null){	//Verifica se existe um um suário logado
+					var log = JSON.parse(database.usuarioLogado); //Converte os dados salvos no storage em JSON
+					document.getElementById('usuario-logado').src = log.foto; //Altero o src da imagem do usuário para a imagem do usuário logado
+					document.getElementById('nome').innerHTML = log.nome + " " +log.sobrenome;	//Adiciono o nome e o sobrenome na view do login
+					document.getElementById('usuario').value = log.usuario + "@gmail.com";	//Adiciono o email do usuário logado no input do usuário
+					document.getElementById('usuario').setAttribute('disabled', true);	//Desabilito a edição o input
+					document.getElementById('usuario').setAttribute('class', 'logado');	//Adiciono a classe "logado" ao input
+					document.getElementById('outra-conta').style.display = 'block';	//Mostra o link para acessar com outra conta
+					document.getElementById('criar').style.display = 'none';	//Esconde o link de criar conta
+					document.getElementById('senha').focus();	//Coloca o foco no campo da senha
+				}
+		}
+		
+		//Função que é executado quado o usuário submete o formulário do login
+		function logar(){
+			var usuarioForm = document.getElementById('usuario');	//Salva o elemento que recebe o usuário na variável
+			var senha = document.getElementById('senha');	//Salava o elemento que recebe a senha na variável
+
+			//Laço para verificar em todos os usuários se este usuário realmente existe
+			for(var i = 0; i <= parseInt(database.indice); i++){				
+				var usuario = "usuario"+ i.toString(); //Esta variável monta o nome do storage
+				var data = database.getItem(usuario); //Busca o storage com o nome montado na variável anterior
+				if(data != undefined){	//Verifica se o storage existe
+					var obj = JSON.parse(data);	//Converte para JSON e salva em uma variável
+					var userExtensao = obj.usuario.toString() + "@gmail.com";	//Salva o usuário selecionado com a extensão do gmail
+					var usuarioFormExtensao = usuarioForm.value;	//Salva o usuário digitado com a extensão do gmail
+
+					//Verifica se o usuário com ou sem extensão existe e verifica se a senha está correta
+					if(obj.usuario.toUpperCase() == usuarioForm.value.toUpperCase() && obj.senha == senha.value || userExtensao.toUpperCase() == usuarioFormExtensao.toUpperCase() && obj.senha == senha.value){
+						usuarioForm.setAttribute('class', '');	//Retira as classes se tiver
+						senha.setAttribute('class', '');	//Retira as classes se tiver
+						erro.innerHTML = "";	//Apaga a mensagem de erro, se tiver
+						database.usuarioLogado = data;	//Atribui este usuário com usuário logado
+
+						var logados = JSON.parse(database.logados);	//Converte para JSON
+						if(logados.indexOf(usuario) == -1)	//Verifica se o usuário não está na lista dos que logaram.
+							logados.push(usuario);	//Se não estiver adiciona na lista
+						database.logados = JSON.stringify(logados);	//Volta a lista alterada para o storage
+
+						window.location = "inbox.html";	//Redireciona para a página "Inbox".
+						return true;	//Retorna verdadeiro e para a execução
+					}					
+				}
+			}
+			senha.setAttribute('class', 'erro');	//Adiciona a classe "erro" no campo senha
+			senha.value = '';	//Apaga o valor digitado na senha
+			usuarioForm.focus();	//Coloca o foco no campo do usuário
+			erro.innerHTML = "O usuário ou a senha estão incorretos!";	//Adiciona a mensagem de erro
+			return false;	//Para a execução do código
+		}
+
+		//função para acessar com outra conta
+		function alterarConta(){
+			database.usuarioLogado = null;	//Retiro o usuário que está logado e seto ele como nulo
+			var logados = JSON.parse(database.logados);	//Recebe a lista de usuários logados
+			if(logados.length == 0)	//Se a lista for vazia
+				window.location = 'login.html';	//redireciona para esta mesma página
+			else	//Do contrário
+				window.location = 'logados.html';	//Redireciona para a página que lista os usuários que logaram
+		}
+	</script>	
+</head>
+<body onload="init()">
+	<div id="pagina">
+		<div id="demo"></div>
+		<img id="logo" src="imagens/logo.png">
+		<h1>Apenas uma conta. Tudo o que o Google oferece.</h1>
+		<h2>Fazer login para prosseguir para o Gmail</h2>
+		<div id="form">
+			<img id="usuario-logado" src="imagens/user.png">
+			<div id="nome"></div>
+			<form action="inbox.html" method="post" onsubmit="return logar()">
+				<input type="text" id="usuario" name="usuario" placeholder="E-mail" autofocus>
+				<input type="password" id="senha" name="senha" placeholder="Senha" >
+				<span id="erro"></span>
+				<input type="submit" value="Fazer login">
+			</form>
+			<a id="criar" href="cadastro.html">Criar uma conta</a><br>
+			<span id="outra-conta" onclick="alterarConta()">Acessar com uma conta diferente</span>
+		</div>
+	</div>
+</body>
+</html>

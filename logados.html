@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf8">
+	<title>Gmail</title>
+	<style type="text/css">
+		#pagina{
+			font-family: Arial;
+			height: auto;
+			padding: 3%;
+			padding-top: 20px;
+			text-align: center;
+			color: #888;
+		}
+		h1{
+			font-size: 35px;
+			font-weight: normal;
+		}
+		h2{
+			font-size: 20px;
+			font-weight: normal;
+		}
+		#logo{
+			width: 110px;
+		}
+		#form{
+			width: 22%;
+			margin: auto;
+			padding: 1%;
+			background-color: #f7f7f7;
+			box-shadow: 0px 3px 3px #aaa;			
+		}
+		.logado{
+			width: 96%;
+			min-height: 50px;
+			padding: 2%;
+			margin-bottom: 5px;
+			background-color: #fff;
+			border-radius: 5px;
+			cursor: pointer;
+			text-align: left;
+			border: 1px solid #eee;
+		}
+		.logado img{
+			width: 35px;
+			height: 35px;
+			border-radius: 35px;
+			margin-right: 3%;
+			margin-top: 7px;
+			float: left;
+		}
+		.email{
+			margin-top: 17px;
+		}
+		a{
+			color: #09f;
+			text-decoration: none;
+		}
+		a:hover{
+			text-decoration: underline;
+		}
+		input{
+			width: 98%;
+			height: 35px;
+			font-family: arial;
+			font-size: 17px;
+			padding-left: 2%;
+			border-color: #ccc;
+			border-width: 1px;
+			border-style: solid;
+		}
+		input[type="submit"]{
+			width: 100%;
+			margin-top: 10px;
+			margin-bottom: 20px;
+			background-color: #07f;
+			color: #fff;
+			font-weight: bold;	
+			font-size: 14px;		
+			border: none;
+			border-radius: 5px;
+			margin-left: auto;
+			margin-right: auto;
+		}		
+		input[type="submit"]:hover{
+			background-color: #06f;
+		}
+		input[type="password"]{
+			margin-bottom: 10px;
+		}
+		form{
+			color: #f00;
+			text-align: left;
+		}
+		.erro{
+			border-color: #f00;
+			outline: none;
+		}
+		.none{
+			color: #888;
+		}
+		.none:hover{
+			text-decoration: none;
+		}
+	</style>
+	<script type="text/javascript">
+		var database = localStorage;
+
+		function init(){
+			var logados = JSON.parse(database.logados);
+			var memory = '';
+			for(var i = 0; i <= logados.length; i++){
+				var data = database.getItem(logados[i]);
+				var usuario = JSON.parse(data);
+				memory = memory + '<a href="#" id="'+ logados[i] +'" class="none"><div class="logado"><img src="' + usuario.foto + '"><div class="email">'+ usuario.usuario + '@gmail.com</div></div></a>';
+				document.getElementById('container-logados').innerHTML = memory;
+			logar();
+			}			
+		}
+		function logar(){
+			var descendentes = document.querySelectorAll("#container-logados a");
+				for (var i = 0; i < descendentes.length; i++) {
+				    descendentes[i].addEventListener("click", function (e) {
+				        var selecionado = database.getItem(this.id);
+				        database.usuarioLogado = selecionado;
+				        window.location = 'login.html';
+				    })
+				}
+		}		
+		
+	</script>	
+</head>
+<body onload="init()">
+	<div id="pagina">
+		<div id="demo"></div>
+		<img id="logo" src="imagens/logo.png">
+		<h1>Selecione uma conta.</h1>
+		<div id="form">
+			<div id="container-logados">					
+			</div>
+			<br>
+			<a href="login.html">Adicionar conta</a>
+		</div>
+	</div>
+</body>
+</html>
